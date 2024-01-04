@@ -10,6 +10,11 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: dependency-check-build-task@6
+  inputs:
+    projectName: 'react-integration-with-owasp-dependency'
+    scanPath: '**'
+    format: 'HTML'
 - task: NodeTool@0
   inputs:
     versionSpec: '18.x'
