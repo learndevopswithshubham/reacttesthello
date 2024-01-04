@@ -1,38 +1,17 @@
-# Node.js with React
-# Build a Node.js project that uses React.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
 trigger:
 - main
 
 pool:
   vmImage: ubuntu-latest
 
+variables:
+- group: "TOKENS_SECURE"
+- name: snyk_token
+  value: $[variables.SNYKTOKEN]
+
 steps:
-- task: dependency-check-build-task@6
-  inputs:
-    projectName: 'react-integration-with-owasp-dependency'
-    scanPath: '**'
-    format: 'HTML'
-- task: NodeTool@0
-  inputs:
-    versionSpec: '18.x'
-  displayName: 'Install Node.js'
-
 - script: |
-    npm install
-    npm run build
-  displayName: 'npm install and build'
-  
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(agent.builddirectory)/s/build'
-    Contents: '**'
-    TargetFolder: '$(build.artifactstagingdirectory)'
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    SNYK_TOKEN=$(snyk_token)
+    export SNYK_TOKEN
+    mvn snyk:test -fn 
+  displayName: "Integrate SCA scan using Snyk in ADO DevSecOps Pipeline"
